@@ -21,7 +21,7 @@ $ source .venv/bin/activate
 ### 3. Install libraries:
 
 ```
-$ pip insta6ll -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 # Usage
