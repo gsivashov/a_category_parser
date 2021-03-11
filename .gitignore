@@ -3,6 +3,7 @@
 *.csv
 *.json
 *.txt
+!requirements.txt
 category_tree.py
 get_child_categories.py
 test_tree.py
