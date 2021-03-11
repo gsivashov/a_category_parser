@@ -1,7 +1,6 @@
 import json
 import random
 import re
-from typing import List
 
 from requests_html import HTMLSession
 
