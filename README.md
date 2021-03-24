@@ -28,9 +28,11 @@ $ pip install -r requirements.txt
 
 Scipt expects that website is defined in HOST variable.
 
-It will crawl starting from URLs defined in urls variable in 86 row.
+It will crawl starting from URLs defined in urls variable inside main function.
 
-Respondes with dictionary with Tree branches staring from pages in urls list to last element
+Respondes with dictionary with Tree branches staring from pages in urls list to last element.
+
+As a starting point you need to use category page with category menu. Main page will be a wrong choice here.
 
 ```
 $ python run.py
