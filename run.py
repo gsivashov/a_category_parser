@@ -45,14 +45,26 @@ def get_response(url):
 
 
 def parse(response):
-    content = response.html.xpath(
-        '//ul[@class="sc-1ovhdji-0 sc-177mb2p-0 jbsqEC kzlJDO"]//a/@href'
-    )
-    h1 = ''.join(response.html.xpath('//h1/text()'))
-    h1 = re.search('.*in\s(.*)$', h1).group(1)
+
+    if response.url == 'https://www.anibis.ch/de/c/alle-kategorien':
+        content = response.html.xpath('//ul[@class="sc-1ovhdji-0 jbsqEC"]//a/@href')
+    else:
+        content = response.html.xpath(
+            '//ul[@class="sc-1ovhdji-0 sc-177mb2p-0 jbsqEC kzlJDO"]//a/@href'
+        )
+        
+    h1 = response.html.xpath('//h1/text()')
+
+    if len(h1) != 0:
+        h1 = response.html.xpath('//h1/text()')[0]
+    else:
+        h1 = 'no h1'
+    #     h1 = re.search("[\d']+\sAngebote\s(in\s)?(.*)$", h1).group(2)
+    internal_links = response.html.xpath('//div[@class="sc-12rmxc1-0 gqlOFz"]//a/@href')
+    
     if not content:
         content
-    return content, h1
+    return content, h1, internal_links
 
 
 def get_absolute_url(href: str) -> str:
@@ -62,12 +74,14 @@ def get_absolute_url(href: str) -> str:
 def walk(url: str):
     result = {
         url: {'h1': '',
+              'text_links': [],
               'links': {}}
         }
 
-    hrefs, h1 = parse(get_response(url))
+    hrefs, h1, text_link = parse(get_response(url))
     if len(hrefs) == 1:
         result[url]['h1'] = h1
+        result[url]['text_links'] = text_link
         return result
 
     for href in hrefs:
@@ -75,6 +89,7 @@ def walk(url: str):
         if url == href_abs:
             continue
         result[url]['h1'] = h1
+        result[url]['text_links'] = text_link
         # result[url].update(walk(href_abs))
         result[url]['links'].update(walk(href_abs))
 
@@ -84,7 +99,10 @@ def walk(url: str):
 
 def main():
     urls = [
-        "https://www.anibis.ch/de/c/haushalt-wohnen-badezimmer",
+        'https://www.anibis.ch/de/c/alle-kategorien',
+        # 'https://www.anibis.ch/de/ce/erotik-livecam',
+        # "https://www.anibis.ch/de/c/haushalt-wohnen-badezimmer",
+        # 'https://www.anibis.ch/de/c/tiere-tierzubehoer',
 
         # "https://www.anibis.ch/de/c/haushalt-wohnen",
         # "https://www.anibis.ch/de/c/handwerk-garten",
@@ -97,7 +115,9 @@ def main():
     for url in urls:
         result.update(walk(url))
 
-    print(json.dumps(result, indent=4))
+    to_print = json.dumps(result, indent=4)
+    with open('de_structure.json', 'w') as output:
+        output.write(to_print)
 
 
 if __name__ == "__main__":
